@@ -742,7 +742,8 @@ export default function App() {
     <div style={{ display: "flex", flexDirection: "column", height: "100vh", fontFamily: "system-ui, sans-serif", background: "#f9fafb", color: "#111827" }}>
 
       <div style={{ padding: "10px 16px", borderBottom: "1px solid #e5e7eb", background: "#fff", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-        <span style={{ fontWeight: 700, fontSize: 15, letterSpacing: "-0.02em", marginRight: 4 }}>🌿 Phylo Viewer</span>
+        <img src="/phylo-viewer/favicon.svg" alt="" style={{ width: 22, height: 22, flexShrink: 0 }} />
+        <span style={{ fontWeight: 700, fontSize: 15, letterSpacing: "-0.02em", marginRight: 4 }}>Phylo Viewer</span>
         <label style={btn("secondary")}>
           Upload .nwk / .tre
           <input type="file" accept=".nwk,.txt,.tree,.tre" onChange={handleFile} style={{ display: "none" }} />
