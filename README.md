@@ -1,16 +1,30 @@
-# React + Vite
+# Phylo Viewer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An interactive phylogenetic tree viewer that runs entirely in the browser. Load a Newick-format tree file, explore it visually, and perform common tree editing operations — all without installing any software or sending your data to a server.
 
-Currently, two official plugins are available:
+**Live app:** https://keaghanjames.github.io/phylo-viewer/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- Load trees from `.nwk` / `.tre` files or paste a Newick string directly
+- Rectangular and radial layouts
+- Branch-length scaling with time axis
+- Zoom, pan, and snap-to-node navigation
+- Clade selection, collapse, extract, and delete
+- Paraphyletic group selection with Phylogenetic Diversity calculation
+- Shift-click two nodes to select their MRCA clade
+- Ladderize, reroot, undo, and export to Newick
+- Tip label search
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Built with
 
-## Expanding the ESLint configuration
+- [React](https://react.dev/) + [Vite](https://vite.dev/)
+- [D3](https://d3js.org/) (hierarchy, zoom, scales)
+- Canvas rendering for performance on large trees
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Local development
+
+```bash
+npm install
+npm run dev
+```
