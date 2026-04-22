@@ -780,8 +780,8 @@ export default function App() {
         {treeData && (
           <>
             <div style={divider} />
-            <button style={btn(layout === "rectangular" ? "primary" : "ghost")} onClick={function() { setLayout("rectangular"); }}>Rectangular</button>
-            <button style={btn(layout === "radial" ? "primary" : "ghost")} onClick={function() { setLayout("radial"); }}>Radial</button>
+            <button style={btn(layout === "rectangular" ? "primary" : "ghost")} onClick={function() { zoomTransformRef.current = d3.zoomIdentity; setLayout("rectangular"); }}>Rectangular</button>
+            <button style={btn(layout === "radial" ? "primary" : "ghost")} onClick={function() { zoomTransformRef.current = d3.zoomIdentity; setLayout("radial"); }}>Radial</button>
             <div style={divider} />
             <button style={btn("ghost")} onClick={function() { doLadderize(true); }}>Ladderize ↑</button>
             <button style={btn("ghost")} onClick={function() { doLadderize(false); }}>Ladderize ↓</button>
