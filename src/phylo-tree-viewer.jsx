@@ -1116,26 +1116,26 @@ export default function App() {
                   <div style={{ padding: 14, borderBottom: "1px solid #f3f4f6" }}>
                     <div style={sectionLabel}>Branch Info</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                      {cladeSummary.branchLength != null && <StatRow label="Branch length" value={cladeSummary.branchLength.toFixed(6)} />}
+                      {cladeSummary.branchLength != null && <StatRow label="Branch length" value={cladeSummary.branchLength.toFixed(6)} color="#d97706" />}
                       {cladeSummary.tips.length === 1
-                        ? <StatRow label="Tip name" value={cladeSummary.tips[0]} />
+                        ? <StatRow label="Tip name" value={cladeSummary.tips[0]} color="#2563eb" />
                         : (
                           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                            <StatRow label="Tips in clade" value={cladeSummary.tips.length} />
-                            {cladeSummary.height > 0 && <StatRow label="Node height" value={cladeSummary.height.toFixed(5)} />}
+                            <StatRow label="Tips in clade" value={cladeSummary.tips.length} color="#2563eb" />
+                            {cladeSummary.height > 0 && <StatRow label="Node height" value={cladeSummary.height.toFixed(5)} color="#2563eb" />}
                             {cladeSummary.sumBL > 0 && (
                               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
-                                <span style={{ fontSize: 11, color: "#6b7280" }}>Phylogenetic Diversity</span>
-                                <span style={{ fontSize: 12, fontWeight: 600, color: "#111827", fontFamily: "monospace", textAlign: "right" }}>
+                                <span style={{ fontSize: 11, color: "#2563eb" }}>Phylogenetic Diversity</span>
+                                <span style={{ fontSize: 12, fontWeight: 600, color: "#2563eb", fontFamily: "monospace", textAlign: "right" }}>
                                   {cladeSummary.sumBL.toFixed(2)}{" "}
-                                  <span style={{ color: "#9ca3af", fontWeight: 400 }}>
+                                  <span style={{ color: "#93c5fd", fontWeight: 400 }}>
                                     ({(cladeSummary.sumBL + stemLengthToNode(treeData, selectedId)).toFixed(2)})
                                   </span>
                                 </span>
                               </div>
                             )}
                             <div>
-                              <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600, marginBottom: 4 }}>TIPS</div>
+                              <div style={{ fontSize: 11, color: "#2563eb", fontWeight: 600, marginBottom: 4 }}>TIPS</div>
                               <div style={{ maxHeight: 160, overflowY: "auto", display: "flex", flexDirection: "column", gap: 2 }}>
                                 {cladeSummary.tips.slice(0, 200).map(function(t, i) {
                                   const ni = sceneRef.current ? sceneRef.current.nodes.find(function(n) { return n.name === t && n.isLeaf; }) : null;
@@ -1515,10 +1515,12 @@ function highlightMatch(name, query) {
 }
 
 function StatRow(props) {
+  const c = props.color || "#6b7280";
+  const vc = props.color || "#111827";
   return (
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
-      <span style={{ fontSize: 11, color: "#6b7280" }}>{props.label}</span>
-      <span style={{ fontSize: 12, fontWeight: 600, color: "#111827", fontFamily: "monospace" }}>{props.value}</span>
+      <span style={{ fontSize: 11, color: c }}>{props.label}</span>
+      <span style={{ fontSize: 12, fontWeight: 600, color: vc, fontFamily: "monospace" }}>{props.value}</span>
     </div>
   );
 }
