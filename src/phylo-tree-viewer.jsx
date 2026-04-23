@@ -324,6 +324,10 @@ export default function App() {
   const [sourceText, setSourceText] = useState("");
   const [renameValue, setRenameValue] = useState("");
   const [lttOpen, setLttOpen] = useState(false);
+  const [whatsNewOpen, setWhatsNewOpen] = useState(function() {
+    return localStorage.getItem("phylo_seen_whats_new") !== "v0.2";
+  });
+  const [citeOpen, setCiteOpen] = useState(false);
 
   const openSource = function() { setSourceText(treeData ? toNewick(treeData) + ";" : ""); setSourceOpen(true); };
   const closeSource = function() { setSourceOpen(false); };
@@ -959,13 +963,14 @@ export default function App() {
 
       <div style={{ padding: "10px 16px", borderBottom: "1px solid #e5e7eb", background: "#fff", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
         <img src="/phylo-viewer/favicon.svg" alt="" style={{ width: 22, height: 22, flexShrink: 0 }} />
-        <span style={{ fontWeight: 700, fontSize: 15, letterSpacing: "-0.02em", marginRight: 4 }}>Phylo Viewer <span style={{ fontWeight: 400, color: "#9ca3af" }}>v0.1</span></span>
+        <span style={{ fontWeight: 700, fontSize: 15, letterSpacing: "-0.02em", marginRight: 4 }}>Phylo Viewer <span style={{ fontWeight: 400, color: "#9ca3af" }}>v0.2</span></span>
         <label style={btn("secondary")}>
           Upload .nwk / .tre
           <input type="file" accept=".nwk,.txt,.tree,.tre" onChange={handleFile} style={{ display: "none" }} />
         </label>
         <button style={btn("ghost")} onClick={function() { setNewickInput(sampleNewick); loadTree(sampleNewick); }}>Demo Tree</button>
         <button style={btn("ghost")} onClick={openFeedback}>Feedback</button>
+        <button style={btn("ghost")} onClick={function() { setCiteOpen(true); }}>How to Cite</button>
         {treeData && (
           <>
             <div style={divider} />
@@ -1500,6 +1505,73 @@ export default function App() {
                 <button style={btn("primary")} onClick={confirmSource}>Confirm</button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {citeOpen && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 }}
+          onClick={function(e) { if (e.target === e.currentTarget) setCiteOpen(false); }}>
+          <div style={{ background: "#fff", borderRadius: 10, padding: 28, maxWidth: 500, width: "90%", boxShadow: "0 20px 60px rgba(0,0,0,0.2)", display: "flex", flexDirection: "column", gap: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ fontSize: 18, fontWeight: 700, color: "#111827" }}>How to Cite</div>
+              <button onClick={function() { setCiteOpen(false); }} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 20, color: "#9ca3af", lineHeight: 1, padding: "0 2px" }}>×</button>
+            </div>
+            <div style={{ fontSize: 12, color: "#6b7280", lineHeight: 1.6 }}>Please cite Phylo Viewer as:</div>
+            {[
+              { label: "APA", text: "Yaxley, K. J. (2026). Phylo Viewer (Version 0.2) [Software]. https://keaghanjames.github.io/phylo-viewer/" },
+              { label: "BibTeX", text: "@software{yaxley2026phyloviewer,\n  author  = {Yaxley, Keaghan J.},\n  title   = {Phylo Viewer},\n  version = {0.2},\n  year    = {2026},\n  url     = {https://keaghanjames.github.io/phylo-viewer/}\n}" },
+            ].map(function(entry) {
+              return (
+                <div key={entry.label}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "#374151", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em" }}>{entry.label}</div>
+                  <div style={{ position: "relative" }}>
+                    <pre style={{ margin: 0, padding: "10px 12px", background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 6, fontSize: 12, fontFamily: "monospace", whiteSpace: "pre-wrap", wordBreak: "break-word", color: "#111827", lineHeight: 1.6 }}>{entry.text}</pre>
+                    <button onClick={function() { navigator.clipboard.writeText(entry.text); }}
+                      style={{ position: "absolute", top: 6, right: 6, fontSize: 11, padding: "2px 8px", border: "1px solid #d1d5db", borderRadius: 4, background: "#fff", cursor: "pointer", color: "#6b7280" }}>
+                      Copy
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {whatsNewOpen && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200 }}
+          onClick={function(e) { if (e.target === e.currentTarget) { localStorage.setItem("phylo_seen_whats_new", "v0.2"); setWhatsNewOpen(false); } }}>
+          <div style={{ background: "#fff", borderRadius: 10, padding: 28, maxWidth: 480, width: "90%", boxShadow: "0 20px 60px rgba(0,0,0,0.2)", display: "flex", flexDirection: "column", gap: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ fontSize: 18, fontWeight: 700, color: "#111827" }}>
+                {"What's new in "}
+                <span style={{ color: "#1a5c35" }}>v0.2</span>
+              </div>
+              <button onClick={function() { localStorage.setItem("phylo_seen_whats_new", "v0.2"); setWhatsNewOpen(false); }}
+                style={{ border: "none", background: "none", cursor: "pointer", fontSize: 20, color: "#9ca3af", lineHeight: 1, padding: "0 2px" }}>×</button>
+            </div>
+            <ul style={{ margin: 0, padding: "0 0 0 18px", display: "flex", flexDirection: "column", gap: 8 }}>
+              {[
+                { bold: "Trait visualisation", text: " — upload a CSV to paint continuous or discrete trait data alongside tip labels as colour-coded squares" },
+                { bold: "Lineages Through Time plot", text: " — open an LTT plot for any time-scaled tree from the header toolbar" },
+                { bold: "Tip renaming", text: " — select a tip in the Clade tab to rename it inline" },
+                { bold: "Arrow key panning", text: " — use ↑ ↓ ← → to pan the canvas in addition to drag" },
+                { bold: "Line weight slider", text: " — scale branch widths and node dot sizes together with a single slider" },
+                { bold: "Colour-coded branch info", text: " — branch length shown in orange, clade statistics in blue, matching the tree highlight colours" },
+                { bold: "MRCA height for paraphyletic groups", text: " — the height of the most recent common ancestor is now shown alongside Phylogenetic Diversity" },
+              ].map(function(item, i) {
+                return (
+                  <li key={i} style={{ fontSize: 13, color: "#374151", lineHeight: 1.55 }}>
+                    <span style={{ fontWeight: 600 }}>{item.bold}</span>{item.text}
+                  </li>
+                );
+              })}
+            </ul>
+            <button style={Object.assign({}, btn("primary"), { alignSelf: "flex-end" })}
+              onClick={function() { localStorage.setItem("phylo_seen_whats_new", "v0.2"); setWhatsNewOpen(false); }}>
+              Got it
+            </button>
           </div>
         </div>
       )}
