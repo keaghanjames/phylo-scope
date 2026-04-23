@@ -3,6 +3,9 @@ PHYLO VIEWER — PATCH NOTES
 
 [dev] — in progress
 --------------------
+- Renamed "Radial" layout button to "Radial (Beta)"
+- Arrow keys (↑ ↓ ← →) now pan the canvas view
+- Tip rename: selecting a leaf in the Clade tab shows a rename input field
 - Added trait data visualisation (third sidebar tab: Traits)
   - Trait squares appear between the tip node and tip label; labels dynamically
     shift right based on the number of active traits

@@ -297,6 +297,7 @@ export default function App() {
   const [traitMatchCount, setTraitMatchCount] = useState({ matched: 0, total: 0 });
   const [sourceOpen, setSourceOpen] = useState(false);
   const [sourceText, setSourceText] = useState("");
+  const [renameValue, setRenameValue] = useState("");
 
   const openSource = function() { setSourceText(treeData ? toNewick(treeData) + ";" : ""); setSourceOpen(true); };
   const closeSource = function() { setSourceOpen(false); };
@@ -437,6 +438,16 @@ export default function App() {
     const n = findNode(t, selectedId);
     if (n) n._collapsed = !n._collapsed;
     pushHistory(treeData); setTreeData(t);
+  };
+
+  const doRename = function(newName) {
+    if (!treeData || !selectedId || !newName.trim()) return;
+    const next = cloneTree(treeData);
+    const n = findNode(next, selectedId);
+    if (!n) return;
+    n.name = newName.trim();
+    applyEdit(next);
+    setRenameValue("");
   };
 
   const exportNewick = function() {
@@ -864,6 +875,16 @@ export default function App() {
         zoomTransformRef.current = d3.zoomIdentity;
         sel.transition().duration(400).call(zoom.transform, d3.zoomIdentity);
       }
+      if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.code) && treeData) {
+        e.preventDefault();
+        var PAN = 60;
+        var t = zoomTransformRef.current;
+        var dx = e.code === "ArrowLeft" ? PAN : e.code === "ArrowRight" ? -PAN : 0;
+        var dy = e.code === "ArrowUp" ? PAN : e.code === "ArrowDown" ? -PAN : 0;
+        var newT = d3.zoomIdentity.translate(t.x + dx, t.y + dy).scale(t.k);
+        zoomTransformRef.current = newT;
+        zoomBehaviorRef.current.transform(d3.select(canvas), newT);
+      }
     };
     window.addEventListener("keydown", handleKey);
     sel.call(zoom).call(zoom.transform, t0);
@@ -914,7 +935,7 @@ export default function App() {
           <>
             <div style={divider} />
             <button style={btn(layout === "rectangular" ? "primary" : "ghost")} onClick={function() { zoomTransformRef.current = d3.zoomIdentity; setLayout("rectangular"); }}>Rectangular</button>
-            <button style={btn(layout === "radial" ? "primary" : "ghost")} onClick={function() { zoomTransformRef.current = d3.zoomIdentity; setLayout("radial"); }}>Radial</button>
+            <button style={btn(layout === "radial" ? "primary" : "ghost")} onClick={function() { zoomTransformRef.current = d3.zoomIdentity; setLayout("radial"); }}>Radial (Beta)</button>
             <div style={divider} />
             <button style={btn("ghost")} onClick={function() { doLadderize(true); }}>Ladderize ↑</button>
             <button style={btn("ghost")} onClick={function() { doLadderize(false); }}>Ladderize ↓</button>
@@ -1022,10 +1043,22 @@ export default function App() {
                       <div style={{ fontSize: 12, padding: "6px 10px", background: "#eff6ff", borderRadius: 6, color: "#1d4ed8", fontWeight: 500 }}>
                         {selectedNode.name || "(internal node)"}
                       </div>
+                      {(!selectedNode.children || !selectedNode.children.length) && (
+                        <div style={{ display: "flex", gap: 4 }}>
+                          <input
+                            value={renameValue}
+                            onChange={function(e) { setRenameValue(e.target.value); }}
+                            onKeyDown={function(e) { if (e.key === "Enter") doRename(renameValue); }}
+                            placeholder="Rename tip…"
+                            style={{ flex: 1, fontSize: 12, padding: "4px 8px", border: "1px solid #d1d5db", borderRadius: 6, outline: "none", fontFamily: "inherit" }}
+                          />
+                          <button style={btn("secondary")} onClick={function() { doRename(renameValue); }}>OK</button>
+                        </div>
+                      )}
                       <button style={btn("secondary", true)} onClick={toggleCollapse}>{selectedNode._collapsed ? "Expand clade" : "Collapse clade"}</button>
                       <button style={btn("secondary", true)} onClick={extractClade}>Extract clade</button>
                       <button style={Object.assign({}, btn("secondary", true), { color: "#dc2626", borderColor: "#fca5a5" })} onClick={deleteClade}>Delete clade</button>
-                      <button style={btn("ghost", true)} onClick={function() { setSelectedId(null); }}>Deselect</button>
+                      <button style={btn("ghost", true)} onClick={function() { setSelectedId(null); setRenameValue(""); }}>Deselect</button>
                     </div>
                   ) : (
                     <div style={{ fontSize: 12, color: "#9ca3af", lineHeight: 1.6 }}>
