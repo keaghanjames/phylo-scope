@@ -1391,8 +1391,8 @@ export default function App() {
 
       {lttOpen && treeData && (function() {
         var hasBL = hasBranchLengths(treeData);
-        var W = 640, H = 340;
-        var mg = { top: 20, right: 30, bottom: 52, left: 58 };
+        var W = 780, H = 420;
+        var mg = { top: 24, right: 40, bottom: 64, left: 68 };
         var iW = W - mg.left - mg.right, iH = H - mg.top - mg.bottom;
         var pathD = "", xTicks = [], yTicks = [];
         if (hasBL) {
@@ -1410,7 +1410,7 @@ export default function App() {
         return (
           <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 }}
             onClick={function(e) { if (e.target === e.currentTarget) setLttOpen(false); }}>
-            <div style={{ background: "#fff", borderRadius: 10, padding: 24, maxWidth: 700, width: "95%", boxShadow: "0 20px 60px rgba(0,0,0,0.2)", display: "flex", flexDirection: "column", gap: 14 }}>
+            <div style={{ background: "#fff", borderRadius: 10, padding: 24, maxWidth: 860, width: "95%", boxShadow: "0 20px 60px rgba(0,0,0,0.2)", display: "flex", flexDirection: "column", gap: 14 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div style={{ fontSize: 17, fontWeight: 700, color: "#111827" }}>Lineages Through Time</div>
                 <button onClick={function() { setLttOpen(false); }} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 20, color: "#9ca3af", lineHeight: 1, padding: "0 2px" }}>×</button>
@@ -1450,7 +1450,7 @@ export default function App() {
                         </g>
                       );
                     })}
-                    <text transform={"translate(-44," + (iH / 2) + ") rotate(-90)"} textAnchor="middle" fontSize={11} fill="#374151">Lineages</text>
+                    <text transform={"translate(-52," + (iH / 2) + ") rotate(-90)"} textAnchor="middle" fontSize={11} fill="#374151">Lineages</text>
                   </g>
                 </svg>
               )}
