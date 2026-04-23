@@ -1060,10 +1060,15 @@ export default function App() {
                       const pd = sumEdgeLengths(treeData, cb);
                       const mrcaId = findMRCA(treeData, multiSelected);
                       const rootPath = mrcaId != null ? stemLengthToNode(treeData, mrcaId) : 0;
+                      const mrcaNode = mrcaId != null ? findNode(treeData, mrcaId) : null;
+                      const mrcaHeight = mrcaNode ? nodeHeight(mrcaNode) : null;
                       return (
                         <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 8, lineHeight: 1.7, padding: "6px 8px", background: "#ede9fe", borderRadius: 4 }}>
                           <span style={{ fontWeight: 700, color: "#7c3aed" }}>Phylogenetic Diversity</span><br />
                           {pd.toFixed(2)} <span style={{ color: "#9ca3af" }}>(incl. root path: {(pd + rootPath).toFixed(2)})</span>
+                          {mrcaHeight != null && mrcaHeight > 0 && (
+                            <><br /><span style={{ fontWeight: 700, color: "#7c3aed" }}>MRCA height</span>{" "}{mrcaHeight.toFixed(5)}</>
+                          )}
                         </div>
                       );
                     })()}
