@@ -301,6 +301,7 @@ export default function App() {
   const [mode, setMode] = useState("select");
   const [cladeSummary, setCladeSummary] = useState(null);
   const [fontSize, setFontSize] = useState(12);
+  const [lineSize, setLineSize] = useState(1);
   const [flipAxis, setFlipAxis] = useState(false);
   const [showLabels, setShowLabels] = useState(true);
   const [leafCount, setLeafCount] = useState(0);
@@ -588,6 +589,7 @@ export default function App() {
     const sx = function(lx) { return lx * k + originX + x; };
     const sy = function(ly) { return ly * k + originY + y; };
 
+    const ls = scene.lineSize || 1;
     links.forEach(function(lk) {
       const isSel = lk.tgtId === sid;
       const inClade = selDescIds.has(lk.srcId) && selDescIds.has(lk.tgtId);
@@ -595,7 +597,7 @@ export default function App() {
       const isConn = connectingBranches.has(lk.tgtId);
       ctx.beginPath();
       ctx.strokeStyle = isSel ? "#f59e0b" : isMultiNode ? "#8b5cf6" : isConn ? "#a78bfa" : inClade ? "#2563eb" : "#d1d5db";
-      ctx.lineWidth = isSel ? 2.5 : (isMultiNode || isConn) ? 2.5 : inClade ? 2 : 1;
+      ctx.lineWidth = (isSel ? 2.5 : (isMultiNode || isConn) ? 2.5 : inClade ? 2 : 1) * ls;
       if (scLayout === "rectangular") {
         ctx.moveTo(sx(lk.sx), sy(lk.sy)); ctx.lineTo(sx(lk.sx), sy(lk.ty)); ctx.lineTo(sx(lk.tx), sy(lk.ty));
       } else {
@@ -604,7 +606,7 @@ export default function App() {
       ctx.stroke();
     });
 
-    const circleR = 3;
+    const circleR = 3 * ls;
     const gap = circleR + 3;
     const autoShow = k > (scene.leafCount > 500 ? 500 / scene.leafCount : 0.3);
     const showLbls = scene.showLabels && autoShow;
@@ -627,14 +629,14 @@ export default function App() {
       }
 
       ctx.beginPath();
-      ctx.arc(screenX, screenY, (ni.selected || isMatch || isFocus || isMultiSel) ? 5 : circleR, 0, 2 * Math.PI);
+      ctx.arc(screenX, screenY, (ni.selected || isMatch || isFocus || isMultiSel) ? circleR + 2 : circleR, 0, 2 * Math.PI);
       ctx.fillStyle = ni.selected ? "#2563eb" : isFocus ? "#dc2626" : isMatch ? "#ef4444"
         : isMultiSel ? "#7c3aed" : isConn ? "#a78bfa" : inClade ? "#93c5fd"
         : ni.collapsed ? "#f59e0b"
         : (traitNodeColor || (ni.isLeaf ? "#374151" : "#9ca3af"));
       ctx.fill();
       ctx.strokeStyle = (isFocus || isMultiSel) ? "#fff" : ni.selected ? "#1d4ed8" : "#fff";
-      ctx.lineWidth = (isFocus || isMultiSel) ? 2 : 1.2;
+      ctx.lineWidth = ((isFocus || isMultiSel) ? 2 : 1.2) * ls;
       ctx.stroke();
 
       // Trait squares — rectangular layout only, leaf nodes only, drawn between node and label
@@ -783,7 +785,7 @@ export default function App() {
       });
     }
 
-    sceneRef.current = { W, H, links, nodes, originX, originY, useBL, maxDepth, tw, margin, layout, selDescIds, selectedId, fontSize, flipAxis, showLabels, leafCount: nLeaves, searchFocusId, cladeFocusId, connectingBranches, traitData, traitMeta, activeTraits };
+    sceneRef.current = { W, H, links, nodes, originX, originY, useBL, maxDepth, tw, margin, layout, selDescIds, selectedId, fontSize, lineSize, flipAxis, showLabels, leafCount: nLeaves, searchFocusId, cladeFocusId, connectingBranches, traitData, traitMeta, activeTraits };
     nodesRef.current = nodes;
     nodes.forEach(function(n) { nodePositionMapRef.current[n.id] = { localX: n.localX, localY: n.localY }; });
 
@@ -833,7 +835,8 @@ export default function App() {
       if (hit == null) {
         const ctx = canvas.getContext("2d");
         const fs = sceneRef.current ? sceneRef.current.fontSize : 12;
-        const circleR = 3, gap = circleR + 3;
+        const ls = sceneRef.current ? (sceneRef.current.lineSize || 1) : 1;
+        const circleR = 3 * ls, gap = circleR + 3;
         for (let i = 0; i < nodesRef.current.length; i++) {
           const ni = nodesRef.current[i];
           if (!ni.name) continue;
@@ -941,6 +944,13 @@ export default function App() {
     }
   }, [traitData, traitMeta, activeTraits]);
 
+  useEffect(function() {
+    if (sceneRef.current) {
+      sceneRef.current.lineSize = lineSize;
+      scheduleRender(zoomTransformRef.current);
+    }
+  }, [lineSize]);
+
   const selectedNode = selectedId != null && treeData ? findNode(treeData, selectedId) : null;
   const multiNodes = treeData ? Array.from(multiSelected).map(function(id) { return findNode(treeData, id); }).filter(Boolean) : [];
 
@@ -983,6 +993,11 @@ export default function App() {
               <input type="range" min={8} max={24} value={fontSize} onChange={function(e) { setFontSize(+e.target.value); }}
                 style={{ width: 70, accentColor: "#374151", cursor: "pointer" }} />
               <span style={{ fontSize: 11, color: "#374151", width: 24 }}>{fontSize}px</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ fontSize: 11, color: "#6b7280", whiteSpace: "nowrap" }}>Weight</span>
+              <input type="range" min={0.5} max={3} step={0.1} value={lineSize} onChange={function(e) { setLineSize(+e.target.value); }}
+                style={{ width: 70, accentColor: "#374151", cursor: "pointer" }} />
             </div>
             {leafCount > 0 && <span style={{ fontSize: 11, color: "#9ca3af" }}>{leafCount.toLocaleString()} tips</span>}
           </>
