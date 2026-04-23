@@ -1391,8 +1391,8 @@ export default function App() {
 
       {lttOpen && treeData && (function() {
         var hasBL = hasBranchLengths(treeData);
-        var W = 780, H = 420;
-        var mg = { top: 24, right: 40, bottom: 64, left: 68 };
+        var W = 936, H = 504;
+        var mg = { top: 28, right: 48, bottom: 76, left: 80 };
         var iW = W - mg.left - mg.right, iH = H - mg.top - mg.bottom;
         var pathD = "", xTicks = [], yTicks = [];
         if (hasBL) {
@@ -1405,12 +1405,15 @@ export default function App() {
             return (i === 0 ? "M" : "L") + xSc(p.t).toFixed(1) + "," + ySc(Math.max(1, p.n)).toFixed(1);
           }).join(" ");
           xTicks = xSc.ticks(6);
-          yTicks = ySc.ticks(5).filter(function(v) { return v >= 1; });
+          var maxLog = Math.ceil(Math.log10(Math.max(maxN, 2)));
+          yTicks = [];
+          for (var p = 0; p <= maxLog; p++) { var tv = Math.pow(10, p); if (tv <= maxN * 1.05) yTicks.push(tv); }
+          if (yTicks.length < 2) yTicks = ySc.ticks(4).filter(function(v) { return v >= 1; });
         }
         return (
           <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 }}
             onClick={function(e) { if (e.target === e.currentTarget) setLttOpen(false); }}>
-            <div style={{ background: "#fff", borderRadius: 10, padding: 24, maxWidth: 860, width: "95%", boxShadow: "0 20px 60px rgba(0,0,0,0.2)", display: "flex", flexDirection: "column", gap: 14 }}>
+            <div style={{ background: "#fff", borderRadius: 10, padding: 24, maxWidth: 1030, width: "95%", boxShadow: "0 20px 60px rgba(0,0,0,0.2)", display: "flex", flexDirection: "column", gap: 14 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div style={{ fontSize: 17, fontWeight: 700, color: "#111827" }}>Lineages Through Time</div>
                 <button onClick={function() { setLttOpen(false); }} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 20, color: "#9ca3af", lineHeight: 1, padding: "0 2px" }}>×</button>
@@ -1450,7 +1453,7 @@ export default function App() {
                         </g>
                       );
                     })}
-                    <text transform={"translate(-52," + (iH / 2) + ") rotate(-90)"} textAnchor="middle" fontSize={11} fill="#374151">Lineages</text>
+                    <text transform={"translate(-62," + (iH / 2) + ") rotate(-90)"} textAnchor="middle" fontSize={11} fill="#374151">Lineages</text>
                   </g>
                 </svg>
               )}
