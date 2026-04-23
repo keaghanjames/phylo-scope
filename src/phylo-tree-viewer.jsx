@@ -1217,7 +1217,7 @@ export default function App() {
                                 <span style={{ fontSize: 12, fontWeight: 600, color: "#2563eb", fontFamily: "monospace", textAlign: "right" }}>
                                   {cladeSummary.sumBL.toFixed(2)}{" "}
                                   <span style={{ color: "#93c5fd", fontWeight: 400 }}>
-                                    ({(cladeSummary.sumBL + stemLengthToNode(treeData, selectedId)).toFixed(2)})
+                                    (incl. root path: {(cladeSummary.sumBL + stemLengthToNode(treeData, selectedId)).toFixed(2)})
                                   </span>
                                 </span>
                               </div>
