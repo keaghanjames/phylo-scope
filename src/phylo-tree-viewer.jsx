@@ -1036,7 +1036,7 @@ export default function App() {
     <div style={{ display: "flex", flexDirection: "column", height: "100vh", fontFamily: "system-ui, sans-serif", background: "#f9fafb", color: "#111827" }}>
 
       <div style={{ padding: "10px 16px", borderBottom: "1px solid #e5e7eb", background: "#fff", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-        <img src="/phyloscope/favicon.svg" alt="" style={{ width: 22, height: 22, flexShrink: 0 }} />
+        <img src="/phylo-scope/favicon.svg" alt="" style={{ width: 22, height: 22, flexShrink: 0 }} />
         <span style={{ fontWeight: 700, fontSize: 15, letterSpacing: "-0.02em", marginRight: 4 }}>phyloScope <span style={{ fontWeight: 400, color: "#9ca3af" }}>v0.2</span></span>
         <label style={btn("secondary")}>
           Upload .nwk / .nex / .tre
@@ -1597,8 +1597,8 @@ export default function App() {
             </div>
             <div style={{ fontSize: 12, color: "#6b7280", lineHeight: 1.6 }}>Please cite phyloScope as:</div>
             {[
-              { label: "APA", text: "Yaxley, K. J. (2026). phyloScope (Version 0.2) [Software]. https://keaghanjames.github.io/phyloscope/" },
-              { label: "BibTeX", text: "@software{yaxley2026phyloscope,\n  author  = {Yaxley, Keaghan J.},\n  title   = {phyloScope},\n  version = {0.2},\n  year    = {2026},\n  url     = {https://keaghanjames.github.io/phyloscope/}\n}" },
+              { label: "APA", text: "Yaxley, K. J. (2026). phyloScope (Version 0.2) [Software]. https://keaghanjames.github.io/phylo-scope/" },
+              { label: "BibTeX", text: "@software{yaxley2026phyloscope,\n  author  = {Yaxley, Keaghan J.},\n  title   = {phyloScope},\n  version = {0.2},\n  year    = {2026},\n  url     = {https://keaghanjames.github.io/phylo-scope/}\n}" },
             ].map(function(entry) {
               return (
                 <div key={entry.label}>

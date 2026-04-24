@@ -60,7 +60,7 @@ PHYLOSCOPE — PATCH NOTES
 ----------------------
 - Initial release
 - Vite + React + D3 project scaffolded and deployed to GitHub Pages
-  at https://keaghanjames.github.io/phyloscope/
+  at https://keaghanjames.github.io/phylo-scope/
 - Core phylogenetic tree viewer features:
   - Load trees from .nwk / .tre files or paste Newick string directly
   - Rectangular and radial layouts
