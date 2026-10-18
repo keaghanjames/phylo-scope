@@ -1257,7 +1257,11 @@ export default function App() {
     const t0 = zoomTransformRef.current;
     scheduleRender(t0);
 
-    const zoom = d3.zoom().scaleExtent([0.01, 200]).on("zoom", function(e) {
+    // Wheel events are handled by the custom listener below (scroll pans, pinch zooms),
+    // so d3 only handles drag-to-pan, touch and double-click here.
+    const zoom = d3.zoom().scaleExtent([0.01, 200]).filter(function(event) {
+      return event.type !== "wheel" && !event.ctrlKey && !event.button;
+    }).on("zoom", function(e) {
       zoomTransformRef.current = e.transform;
       scheduleRender(e.transform);
     });
@@ -1363,19 +1367,57 @@ export default function App() {
     };
     window.addEventListener("keydown", handleKey);
     sel.call(zoom).call(zoom.transform, t0);
-    canvas.addEventListener("wheel", function(event) {
-      if (!event.shiftKey) return;
+    // Trackpad pinch arrives as a wheel event with ctrlKey set (Chrome, Firefox, Edge);
+    // Ctrl/⌘ + mouse wheel zooms too. Plain two-finger scroll or mouse wheel pans.
+    var gestureActive = false;
+    const handleWheel = function(event) {
+      event.preventDefault();
+      if (gestureActive) return;
+      var unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? H : 1;
+      var dx = event.deltaX * unit, dy = event.deltaY * unit;
+      if (event.ctrlKey || event.metaKey) {
+        // Pinch deltas are small, mouse-wheel deltas large; clamp so one notch isn't a huge jump
+        var step = Math.max(-50, Math.min(50, dy));
+        var factor = Math.pow(2, -step * (event.ctrlKey ? 0.01 : 0.002));
+        zoom.scaleBy(sel, factor, d3.pointer(event, canvas));
+        return;
+      }
+      // Shift + mouse wheel pans horizontally (some browsers already swap the axes)
+      if (event.shiftKey && dx === 0) { dx = dy; dy = 0; }
+      var t = zoomTransformRef.current;
+      var newT = d3.zoomIdentity.translate(t.x - dx, t.y - dy).scale(t.k);
+      zoomTransformRef.current = newT;
+      zoom.transform(sel, newT);
+    };
+    // Safari reports trackpad pinch as proprietary gesture events rather than ctrl+wheel
+    var gestureStartK = 1;
+    const handleGestureStart = function(event) {
+      event.preventDefault();
+      gestureActive = true;
+      gestureStartK = zoomTransformRef.current.k;
+    };
+    const handleGestureChange = function(event) {
       event.preventDefault();
       var t = zoomTransformRef.current;
-      var delta = -event.deltaY;
-      var newT = (event.metaKey || event.ctrlKey)
-        ? d3.zoomIdentity.translate(t.x + delta, t.y).scale(t.k)
-        : d3.zoomIdentity.translate(t.x, t.y + delta).scale(t.k);
-      zoomTransformRef.current = newT;
-      zoomBehaviorRef.current.transform(d3.select(canvas), newT);
-    }, { passive: false });
+      zoom.scaleBy(sel, (gestureStartK * event.scale) / t.k, d3.pointer(event, canvas));
+    };
+    const handleGestureEnd = function(event) {
+      event.preventDefault();
+      gestureActive = false;
+    };
+    canvas.addEventListener("wheel", handleWheel, { passive: false });
+    canvas.addEventListener("gesturestart", handleGestureStart);
+    canvas.addEventListener("gesturechange", handleGestureChange);
+    canvas.addEventListener("gestureend", handleGestureEnd);
 
-    return function() { sel.on(".tree", null); sel.on(".zoom", null); window.removeEventListener("keydown", handleKey); };
+    return function() {
+      sel.on(".tree", null); sel.on(".zoom", null);
+      window.removeEventListener("keydown", handleKey);
+      canvas.removeEventListener("wheel", handleWheel);
+      canvas.removeEventListener("gesturestart", handleGestureStart);
+      canvas.removeEventListener("gesturechange", handleGestureChange);
+      canvas.removeEventListener("gestureend", handleGestureEnd);
+    };
   }, [treeData, layout, selectedId, multiSelected, mode, fontSize, flipAxis, showLabels]);
 
   useEffect(function() {
@@ -1811,8 +1853,8 @@ export default function App() {
 
                 <div style={{ padding: 14, marginTop: "auto" }}>
                   <div style={{ fontSize: 11, color: "#d1d5db", lineHeight: 1.8 }}>
-                    Scroll to zoom · Drag to pan<br />
-                    <span style={{ color: "#e5e7eb" }}>⇧ scroll</span> to pan vertically · <span style={{ color: "#e5e7eb" }}>⌘⇧ scroll</span> to pan horizontally<br />
+                    Scroll or drag to pan · <span style={{ color: "#e5e7eb" }}>⇧ scroll</span> to pan horizontally<br />
+                    Pinch or <span style={{ color: "#e5e7eb" }}>⌘/Ctrl scroll</span> to zoom<br />
                     Hit Space to re-centre<br />
                     <span style={{ color: "#93c5fd" }}>⇧ click</span> two nodes to select their clade<br />
                     <span style={{ color: "#c4b5fd" }}>⌘/Ctrl+click</span> to build paraphyletic group
